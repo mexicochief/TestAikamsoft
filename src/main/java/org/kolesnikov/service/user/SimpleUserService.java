@@ -2,7 +2,7 @@ package org.kolesnikov.service.user;
 
 import org.kolesnikov.dto.UserDto;
 import org.kolesnikov.model.User;
-import org.kolesnikov.query.UserQuery;
+import org.kolesnikov.query.QueryExecutor;
 import org.kolesnikov.repository.user.UserDBManager;
 import org.kolesnikov.service.user.converter.UserConverter;
 
@@ -25,8 +25,9 @@ public class SimpleUserService implements UserService {
     }
 
     @Override
-    public List<UserDto> get(UserQuery userQuery) {
-        final List<User> users = userDBManager.get(userQuery);
+    public List<UserDto> get(QueryExecutor queryManager) {
+
+        final List<User> users = userDBManager.get(queryManager);
         return users
                 .stream()
                 .map(userConverter::convert)
