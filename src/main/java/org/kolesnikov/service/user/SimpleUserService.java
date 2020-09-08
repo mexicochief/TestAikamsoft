@@ -25,9 +25,9 @@ public class SimpleUserService implements UserService {
     }
 
     @Override
-    public List<UserDto> get(QueryExecutor queryManager) {
+    public List<UserDto> get(QueryExecutor queryExecutor) {
 
-        final List<User> users = userDBManager.get(queryManager);
+        final List<User> users = userDBManager.get(queryExecutor);
         return users
                 .stream()
                 .map(userConverter::convert)

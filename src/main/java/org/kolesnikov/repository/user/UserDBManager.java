@@ -9,7 +9,7 @@ public interface UserDBManager {
 
     User put(User user);
 
-    List<User> get(QueryExecutor queryManager);
+    List<User> get(QueryExecutor queryExecutor);
 
     User getById(long id);
 

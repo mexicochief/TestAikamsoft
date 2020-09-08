@@ -9,7 +9,7 @@ public interface UserService {
 
     UserDto put(UserDto userDto);
 
-    List<UserDto> get(QueryExecutor queryManager);
+    List<UserDto> get(QueryExecutor queryExecutor);
 
     UserDto getById(long id);
 

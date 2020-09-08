@@ -24,19 +24,8 @@ public class SimpleUserDBManager implements UserDBManager {
     }
 
     @Override
-    public List<User> get(QueryExecutor executor) {
-        List<User> users = new ArrayList<>();
-        try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(executor.getSqlQuery())) {
-            final ResultSet resultSet = executor.execute(preparedStatement);
-            while (resultSet.next()) {
-                final String firstName = resultSet.getString(1);
-                final String lastName = resultSet.getString(2);
-                users.add(new User(firstName, lastName));
-            }
-        } catch (SQLException e) {
-            throw new DbException(e.getMessage(), e.getCause());
-        }
-        return users;
+    public List<User> get(QueryExecutor queryExecutor) {
+        return queryExecutor.runScript(dataSource);
     }
 
     @Override

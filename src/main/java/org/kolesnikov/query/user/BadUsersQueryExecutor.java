@@ -1,9 +1,17 @@
-package org.kolesnikov.query;
+package org.kolesnikov.query.user;
 
+
+import org.kolesnikov.exception.DbException;
+import org.kolesnikov.model.User;
+import org.kolesnikov.query.QueryExecutor;
+
+import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BadUsersQueryExecutor implements QueryExecutor {
@@ -29,9 +37,20 @@ public class BadUsersQueryExecutor implements QueryExecutor {
     }
 
     @Override
-    public ResultSet execute(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setLong(1, limit);
-        return preparedStatement.executeQuery();
+    public List<User> runScript(DataSource dataSource) {
+        List<User> users = new ArrayList<>();
+        try (final PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(QUERY)) {
+            preparedStatement.setLong(1, limit);
+            final ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                final String firstName = resultSet.getString(1);
+                final String lastName = resultSet.getString(2);
+                users.add(new User(firstName, lastName));
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage(), e.getCause());
+        }
+        return users;
     }
 
     @Override
