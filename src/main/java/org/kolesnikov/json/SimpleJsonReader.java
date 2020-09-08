@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class SimpleJsonReader implements JsonReader {
     @Override
     public JsonNode read(String path) {
-        try (InputStream inputStream = StoreApp.class.getClassLoader().getResourceAsStream("test.json")) {
+        try (InputStream inputStream = StoreApp.class.getClassLoader().getResourceAsStream(path)) {
             ObjectMapper objectMapper = new ObjectMapper();
             if (inputStream != null) {
                 return objectMapper.readValue(inputStream, JsonNode.class);

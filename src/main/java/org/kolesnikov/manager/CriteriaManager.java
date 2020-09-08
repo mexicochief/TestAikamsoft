@@ -1,6 +1,7 @@
 package org.kolesnikov.manager;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonObject;
 import org.kolesnikov.query.QueryExecutor;
 import org.kolesnikov.resolver.ExecutorFactory;
 import org.kolesnikov.resolver.NodeResolver;
