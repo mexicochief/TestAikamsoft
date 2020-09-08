@@ -3,6 +3,8 @@ package org.kolesnikov.query;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PurchaseSumIntervalQueryExecutor implements QueryExecutor {
     private final String GET_BY_OVERALL_SUM = "select first_name, last_name " +
@@ -11,12 +13,14 @@ public class PurchaseSumIntervalQueryExecutor implements QueryExecutor {
             "         left join store.purchases purch on users.id = purch.user_id " +
             "         left join store.products prod on purch.product_id = prod.id " +
             "group by first_name, last_name, userId) as userWithOverallSum where overallCost > ? and overallCost < ?";
-    private final long minSum;
-    private final long maxSum;
+
+    private Map<String, String> criteria;
+    private final long minExpenses;
+    private final long maxExpenses;
 
     public PurchaseSumIntervalQueryExecutor(long minSum, long maxSum) {
-        this.minSum = minSum;
-        this.maxSum = maxSum;
+        this.minExpenses = minSum;
+        this.maxExpenses = maxSum;
     }
 
     @Override
@@ -26,8 +30,18 @@ public class PurchaseSumIntervalQueryExecutor implements QueryExecutor {
 
     @Override
     public ResultSet execute(PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setLong(1, minSum);
-        preparedStatement.setLong(2, maxSum);
+        preparedStatement.setLong(1, minExpenses);
+        preparedStatement.setLong(2, maxExpenses);
         return preparedStatement.executeQuery();
+    }
+
+    @Override
+    public Map<String, String> getCriteria() {
+        if (criteria == null) {
+            criteria = new HashMap<>();
+            criteria.put("minExpenses", String.valueOf(minExpenses));
+            criteria.put("maxExpenses", String.valueOf(maxExpenses));
+        }
+        return criteria;
     }
 }
