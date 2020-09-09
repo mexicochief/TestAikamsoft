@@ -29,11 +29,6 @@ public class SimpleStatisticDbManager implements StatisticDbManager {
     }
 
     @Override
-    public Statistic put(Statistic statistic) {
-        return null;
-    }
-
-    @Override
     public List<Statistic> get(StatisticQuery statisticQuery) {
         try (final PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(QUERY)) {
             List<Statistic> statistics = new ArrayList<>();
@@ -53,20 +48,5 @@ public class SimpleStatisticDbManager implements StatisticDbManager {
         } catch (SQLException e) {
             throw new DbException(e.getMessage(), e.getCause());
         }
-    }
-
-    @Override
-    public Statistic getById(long id) {
-        return null;
-    }
-
-    @Override
-    public Statistic update(Statistic statistic) {
-        return null;
-    }
-
-    @Override
-    public void delete(long id) {
-
     }
 }

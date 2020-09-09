@@ -1,0 +1,12 @@
+{
+  "criterias": [
+    {"lastName": "Lee"},
+    {"productName": "Cola", "minTimes": 2},
+    {"minExpenses": 10, "maxExpenses": 100},
+    {"badCustomers": 3},
+    {"lastName": ""},
+    {"badCustomers": 0},
+    {"minEanses": -1, "maxExpenses": 200},
+    {"minExpenses": 10, "maxExpenses": 100}
+  ]
+}

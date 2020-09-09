@@ -44,7 +44,7 @@ public class BadUsersQueryExecutor implements UserQueryExecutor {
             while (resultSet.next()) {
                 final String firstName = resultSet.getString(1);
                 final String lastName = resultSet.getString(2);
-                users.add(new User(firstName, lastName));
+                users.add(new User(null, firstName, lastName));
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage(), e.getCause());
