@@ -1,7 +1,7 @@
 package org.kolesnikov.service.statisitc.converter;
 
-import org.kolesnikov.Purchase;
-import org.kolesnikov.StatisticResult;
+import org.kolesnikov.result.Purchase;
+import org.kolesnikov.result.StatisticResult;
 import org.kolesnikov.dto.StatisticDto;
 import org.kolesnikov.model.Statistic;
 

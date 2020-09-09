@@ -3,14 +3,12 @@ package org.kolesnikov.manager.search;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.kolesnikov.StatisticResult;
+import org.kolesnikov.result.StatisticResult;
 import org.kolesnikov.query.statisitc.StatisticQuery;
 import org.kolesnikov.service.statisitc.StatisticService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Date;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,16 +1,15 @@
-package org.kolesnikov.resolver;
+package org.kolesnikov.resolver.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.kolesnikov.Criterias;
 import org.kolesnikov.query.user.PurchaseSumIntervalQueryExecutor;
-import org.kolesnikov.query.QueryExecutor;
+import org.kolesnikov.query.user.UserQueryExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PurchaseSumIntervalExecutorFactory implements ExecutorFactory {
-    private final List<Criterias> criterias;//todo
+    private final List<Criterias> criterias;
 
     public PurchaseSumIntervalExecutorFactory() {
         criterias = new ArrayList<>();
@@ -28,7 +27,7 @@ public class PurchaseSumIntervalExecutorFactory implements ExecutorFactory {
     }
 
     @Override
-    public QueryExecutor create(JsonNode criteria) {
+    public UserQueryExecutor create(JsonNode criteria) {
         final long minSum = criteria.get(Criterias.MIN_EXPENSES.getValue()).asLong();
         final long maxSum = criteria.get(Criterias.MAX_EXPENSES.getValue()).asLong();
         return new PurchaseSumIntervalQueryExecutor(minSum, maxSum);

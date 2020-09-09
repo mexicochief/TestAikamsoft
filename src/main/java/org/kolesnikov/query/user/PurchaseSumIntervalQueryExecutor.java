@@ -2,7 +2,6 @@ package org.kolesnikov.query.user;
 
 import org.kolesnikov.exception.DbException;
 import org.kolesnikov.model.User;
-import org.kolesnikov.query.QueryExecutor;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
@@ -13,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PurchaseSumIntervalQueryExecutor implements QueryExecutor {
+public class PurchaseSumIntervalQueryExecutor implements UserQueryExecutor {
     private final String QUERY = "select first_name, last_name " +
             "from (select users.id userId, first_name, last_name, sum(cost) overallCost " +
             "from store.users " +

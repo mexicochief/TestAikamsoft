@@ -1,4 +1,4 @@
-package org.kolesnikov.query;
+package org.kolesnikov.query.user;
 
 import org.kolesnikov.model.User;
 
@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-public interface QueryExecutor {
+public interface UserQueryExecutor {
     String getSqlQuery();
 
     List<User> runScript(DataSource dataSource);

@@ -1,15 +1,23 @@
+create user store with
+    password '123';
+
+create database TestAikamsoft with
+    owner = store
+    encoding = 'UTF8';
+
 CREATE schema Store;
+
 create table Store.Users
 (
     id         serial primary key,
-    first_name varchar(30),
-    last_name  varchar(30)
+    first_name varchar(256),
+    last_name  varchar(256)
 );
 
 create table Store.Products
 (
     id           serial primary key,
-    product_name varchar(30),
+    product_name varchar(256),
     cost         numeric(1000,2)
 );
 

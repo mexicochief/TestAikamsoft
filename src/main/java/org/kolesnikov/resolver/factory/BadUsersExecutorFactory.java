@@ -1,21 +1,21 @@
-package org.kolesnikov.resolver;
+package org.kolesnikov.resolver.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.kolesnikov.Criterias;
-import org.kolesnikov.query.user.LastNameQueryExecutor;
-import org.kolesnikov.query.QueryExecutor;
+import org.kolesnikov.query.user.BadUsersQueryExecutor;
+import org.kolesnikov.query.user.UserQueryExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LastNameExecutorFactory implements ExecutorFactory {
+public class BadUsersExecutorFactory implements ExecutorFactory {
     private final List<Criterias> criterias;
 
-    public LastNameExecutorFactory() {
+    public BadUsersExecutorFactory() {
         criterias = new ArrayList<>();
-        criterias.add(Criterias.LAST_NAME);
+        criterias.add(Criterias.BAD_CUSTOMERS);
     }
+
 
     @Override
     public boolean hasSameType(List<String> names) {
@@ -27,7 +27,7 @@ public class LastNameExecutorFactory implements ExecutorFactory {
     }
 
     @Override
-    public QueryExecutor create(JsonNode criteria) {
-        return new LastNameQueryExecutor(criteria.get(Criterias.LAST_NAME.getValue()).asText());
+    public UserQueryExecutor create(JsonNode criteria) {
+        return new BadUsersQueryExecutor(criteria.get(Criterias.BAD_CUSTOMERS.getValue()).asLong());
     }
 }

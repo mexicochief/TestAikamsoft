@@ -1,4 +1,4 @@
-package org.kolesnikov;
+package org.kolesnikov.result;
 
 import java.math.BigDecimal;
 
