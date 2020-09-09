@@ -45,8 +45,11 @@ public class SimpleStatisticConverter implements StatisticConverter {
         BigDecimal overallExpenses = new BigDecimal(0);
         for (String name : usePurchasesMap.keySet()) {
             final ArrayList<Purchase> purchases = usePurchasesMap.get(name);
-            final Optional<BigDecimal> reduce = purchases.stream().map(Purchase::getExpenses).reduce(BigDecimal::add);
-            final BigDecimal totalExpenses = reduce.get();//todo
+            final BigDecimal totalExpenses = purchases
+                    .stream()
+                    .map(Purchase::getExpenses)
+                    .reduce(BigDecimal::add)
+                    .orElseGet(() -> new BigDecimal(0));
             overallExpenses = overallExpenses.add(totalExpenses);
             statisticResults.add(new StatisticResult(name, purchases, totalExpenses));
         }

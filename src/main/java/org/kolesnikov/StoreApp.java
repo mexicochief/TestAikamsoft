@@ -3,7 +3,6 @@ package org.kolesnikov;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -35,20 +34,35 @@ import org.kolesnikov.service.user.converter.SimpleUserConverter;
 import org.kolesnikov.service.user.converter.UserConverter;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class StoreApp {
     static Logger logger = Logger.getLogger(StoreApp.class);
+    static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static void main(String[] args) throws IOException { //todo
+    public static void main(String[] args) {
         Layout layout = new PatternLayout();
-        FileAppender appender = new FileAppender(layout, "test.json", false);
+        FileAppender appender;
+        try {
+            appender = new FileAppender(layout, "output.json", false);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         logger.addAppender(appender);
-
         logger.setLevel(Level.DEBUG);
+
+
+        if (args.length < 3) {
+            logger.error(gson.toJson(Map.of("error", "Должно быть 3 аргументов командной строки")));
+            throw new RuntimeException("Недостаточно параметров");
+        }
+        final String type = args[0];
+        final String inputFileName = args[1];
+        final String outputFileName = args[2];
 
 
         PropertiesLoader propertiesLoader = new PropertiesLoader();
@@ -61,12 +75,12 @@ public class StoreApp {
         hikariConfig.setMaximumPoolSize(Integer.parseInt(property.getProperty("maximumPoolSize")));
         HikariDataSource dataSource = new HikariDataSource(hikariConfig);
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonReader jsonReader = new SimpleJsonReader();
+        JsonReader jsonReader = new SimpleJsonReader(logger, gson);
         JsonWriter jsonWriter = new SimpleJsonWriter(gson);
-        final JsonNode jsonNode = jsonReader.read("stat.json");//todo обработать null
+        final JsonNode jsonNode = jsonReader.read(inputFileName);
+        validate(jsonNode);
 
-        if (args[0].equalsIgnoreCase("search")) {
+        if (type.equalsIgnoreCase("search")) {
             UserDBManager userDBManager = new SimpleUserDBManager(dataSource);
             UserConverter userConverter = new SimpleUserConverter();
             UserService userService = new SimpleUserService(userDBManager, userConverter);
@@ -82,7 +96,7 @@ public class StoreApp {
             QueryManager queryManager = new CriteriaManager(nodeResolver);
 
             final JsonNode criterias = jsonNode.get("criterias");
-
+            validate(criterias);
 
             List<QueryExecutor> queryExecutors = queryManager.getQueryExecutors(criterias);
 
@@ -91,20 +105,27 @@ public class StoreApp {
             final JsonObject jsonObject = searchManager.find(queryExecutors);
             jsonWriter.write(jsonObject, "output.json");
 
-        } else if (args[0].equalsIgnoreCase("stat")) {
+        } else if (type.equalsIgnoreCase("stat")) {
 
             final StatisticDbManager statisticDbManager = new SimpleStatisticDbManager(dataSource);
             final StatisticConverter statisticConverter = new SimpleStatisticConverter();
             final StatisticService statisticService = new SimpleStatisticService(statisticDbManager, statisticConverter);
             final DateSearchManager searchManager = new DateSearchManager(statisticService, gson);
 
-            DateParser dateParser = new DateParser();
+            DateParser dateParser = new DateParser(logger, gson);
             final Date startDate = dateParser.getProperty("startDate", jsonNode);
             final Date endDate = dateParser.getProperty("endDate", jsonNode);
 
             final JsonObject resultStatJson = searchManager.find(new StatisticQuery(startDate, endDate));
 
             jsonWriter.write(resultStatJson, "output.json");
+        }
+    }
+
+    static void validate(JsonNode jsonNode) {
+        if (jsonNode == null) {
+            logger.info(gson.toJson(Map.of("error", "Missing json property")));
+            throw new RuntimeException("Missing json property");
         }
     }
 }
