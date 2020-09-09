@@ -1,8 +1,7 @@
-package org.kolesnikov.resolver;
+package org.kolesnikov.resolver.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.kolesnikov.Criterias;
-import org.kolesnikov.query.QueryExecutor;
+import org.kolesnikov.query.user.UserQueryExecutor;
 import org.kolesnikov.query.user.ProductPurchaseCountQueryExecutor;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class ProductCountExecutorFactory implements ExecutorFactory {
     }
 
     @Override
-    public QueryExecutor create(JsonNode criteria) {
+    public UserQueryExecutor create(JsonNode criteria) {
         final String productName = Criterias.PRODUCT_NAME.getValue();
         final String minTimes = Criterias.MIN_TIMES.getValue();
         return new ProductPurchaseCountQueryExecutor(

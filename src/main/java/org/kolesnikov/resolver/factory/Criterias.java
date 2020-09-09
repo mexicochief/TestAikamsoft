@@ -1,4 +1,4 @@
-package org.kolesnikov;
+package org.kolesnikov.resolver.factory;
 
 public enum Criterias {
     LAST_NAME("lastName"),

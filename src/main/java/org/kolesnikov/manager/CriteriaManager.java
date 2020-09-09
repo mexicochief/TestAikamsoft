@@ -1,9 +1,8 @@
 package org.kolesnikov.manager;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.JsonObject;
-import org.kolesnikov.query.QueryExecutor;
-import org.kolesnikov.resolver.ExecutorFactory;
+import org.kolesnikov.query.user.UserQueryExecutor;
+import org.kolesnikov.resolver.factory.ExecutorFactory;
 import org.kolesnikov.resolver.NodeResolver;
 
 import java.util.ArrayList;
@@ -18,16 +17,14 @@ public class CriteriaManager implements QueryManager {
     }
 
     @Override
-    public List<QueryExecutor> getQueryExecutors(JsonNode criterias) {
-        List<QueryExecutor> queryExecutors = new ArrayList<>();
+    public List<UserQueryExecutor> getQueryExecutors(JsonNode criterias) {
+        List<UserQueryExecutor> queryExecutors = new ArrayList<>();
         for (JsonNode criteria : criterias) {
             List<String> names = new ArrayList<>();
             final Iterator<String> stringIterator = criteria.fieldNames();
             stringIterator.forEachRemaining(names::add);
             final ExecutorFactory factory = nodeResolver.resolve(names);
-            if (factory != null) { //todo
-                queryExecutors.add(factory.create(criteria)); //todo
-            }
+            queryExecutors.add(factory.create(criteria));
         }
         return queryExecutors;
     }

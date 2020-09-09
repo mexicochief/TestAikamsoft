@@ -14,16 +14,17 @@ import org.kolesnikov.json.SimpleJsonWriter;
 import org.kolesnikov.manager.CriteriaManager;
 import org.kolesnikov.manager.QueryManager;
 import org.kolesnikov.manager.search.DateSearchManager;
-import org.kolesnikov.manager.search.SearchManager;
+import org.kolesnikov.manager.search.CriteriaSearchManager;
 import org.kolesnikov.parser.DateParser;
 import org.kolesnikov.properties.PropertiesLoader;
-import org.kolesnikov.query.QueryExecutor;
+import org.kolesnikov.query.user.UserQueryExecutor;
 import org.kolesnikov.query.statisitc.StatisticQuery;
 import org.kolesnikov.repository.statistic.SimpleStatisticDbManager;
 import org.kolesnikov.repository.statistic.StatisticDbManager;
 import org.kolesnikov.repository.user.SimpleUserDBManager;
 import org.kolesnikov.repository.user.UserDBManager;
 import org.kolesnikov.resolver.*;
+import org.kolesnikov.resolver.factory.*;
 import org.kolesnikov.service.statisitc.SimpleStatisticService;
 import org.kolesnikov.service.statisitc.StatisticService;
 import org.kolesnikov.service.statisitc.converter.SimpleStatisticConverter;
@@ -45,25 +46,21 @@ public class StoreApp {
     static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public static void main(String[] args) {
-        Layout layout = new PatternLayout();
-        FileAppender appender;
-        try {
-            appender = new FileAppender(layout, "output.json", false);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        logger.addAppender(appender);
-        logger.setLevel(Level.DEBUG);
-
-
         if (args.length < 3) {
-            logger.error(gson.toJson(Map.of("error", "Должно быть 3 аргументов командной строки")));
             throw new RuntimeException("Недостаточно параметров");
         }
         final String type = args[0];
         final String inputFileName = args[1];
         final String outputFileName = args[2];
-
+        Layout layout = new PatternLayout();
+        FileAppender appender;
+        try {
+            appender = new FileAppender(layout, outputFileName, false);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        logger.addAppender(appender);
+        logger.setLevel(Level.DEBUG);
 
         PropertiesLoader propertiesLoader = new PropertiesLoader();
         final Properties property = propertiesLoader.getProperty("server.properties");
@@ -91,19 +88,19 @@ public class StoreApp {
             factories.add(new LastNameExecutorFactory());
             factories.add(new PurchaseSumIntervalExecutorFactory());
 
-            NodeResolver nodeResolver = new NodeResolver(factories);
+            NodeResolver nodeResolver = new NodeResolver(factories, logger, gson);
 
             QueryManager queryManager = new CriteriaManager(nodeResolver);
 
             final JsonNode criterias = jsonNode.get("criterias");
             validate(criterias);
 
-            List<QueryExecutor> queryExecutors = queryManager.getQueryExecutors(criterias);
+            List<UserQueryExecutor> queryExecutors = queryManager.getQueryExecutors(criterias);
 
 
-            SearchManager searchManager = new SearchManager(userService, gson);
+            CriteriaSearchManager searchManager = new CriteriaSearchManager(userService, gson);
             final JsonObject jsonObject = searchManager.find(queryExecutors);
-            jsonWriter.write(jsonObject, "output.json");
+            jsonWriter.write(jsonObject, outputFileName);
 
         } else if (type.equalsIgnoreCase("stat")) {
 
@@ -118,7 +115,7 @@ public class StoreApp {
 
             final JsonObject resultStatJson = searchManager.find(new StatisticQuery(startDate, endDate));
 
-            jsonWriter.write(resultStatJson, "output.json");
+            jsonWriter.write(resultStatJson, outputFileName);
         }
     }
 
