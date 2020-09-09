@@ -18,7 +18,7 @@ public class SearchManager {
         this.gson = gson;
     }
 
-    public JsonObject findByQueries(List<QueryExecutor> queryExecutors) {
+    public JsonObject find(List<QueryExecutor> queryExecutors) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", "search");
         JsonArray results = new JsonArray();
