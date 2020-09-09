@@ -3,17 +3,20 @@ package org.kolesnikov;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.kolesnikov.dto.StatisticDto;
+import org.apache.log4j.*;
 import org.kolesnikov.json.JsonReader;
 import org.kolesnikov.json.JsonWriter;
 import org.kolesnikov.json.SimpleJsonReader;
 import org.kolesnikov.json.SimpleJsonWriter;
 import org.kolesnikov.manager.CriteriaManager;
 import org.kolesnikov.manager.QueryManager;
+import org.kolesnikov.manager.search.DateSearchManager;
 import org.kolesnikov.manager.search.SearchManager;
+import org.kolesnikov.parser.DateParser;
 import org.kolesnikov.properties.PropertiesLoader;
 import org.kolesnikov.query.QueryExecutor;
 import org.kolesnikov.query.statisitc.StatisticQuery;
@@ -31,13 +34,21 @@ import org.kolesnikov.service.user.UserService;
 import org.kolesnikov.service.user.converter.SimpleUserConverter;
 import org.kolesnikov.service.user.converter.UserConverter;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class StoreApp {
-    public static void main(String[] args) {
+    static Logger logger = Logger.getLogger(StoreApp.class);
+
+    public static void main(String[] args) throws IOException { //todo
+        Layout layout = new PatternLayout();
+        FileAppender appender = new FileAppender(layout, "test.json", false);
+        logger.addAppender(appender);
+
+        logger.setLevel(Level.DEBUG);
 
 
         PropertiesLoader propertiesLoader = new PropertiesLoader();
@@ -53,6 +64,7 @@ public class StoreApp {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonReader jsonReader = new SimpleJsonReader();
         JsonWriter jsonWriter = new SimpleJsonWriter(gson);
+        final JsonNode jsonNode = jsonReader.read("stat.json");//todo обработать null
 
         if (args[0].equalsIgnoreCase("search")) {
             UserDBManager userDBManager = new SimpleUserDBManager(dataSource);
@@ -69,7 +81,6 @@ public class StoreApp {
 
             QueryManager queryManager = new CriteriaManager(nodeResolver);
 
-            final JsonNode jsonNode = jsonReader.read("test.json");
             final JsonNode criterias = jsonNode.get("criterias");
 
 
@@ -77,19 +88,23 @@ public class StoreApp {
 
 
             SearchManager searchManager = new SearchManager(userService, gson);
-            final JsonObject jsonObject = searchManager.findByQueries(queryExecutors);
-
+            final JsonObject jsonObject = searchManager.find(queryExecutors);
             jsonWriter.write(jsonObject, "output.json");
+
         } else if (args[0].equalsIgnoreCase("stat")) {
-            final JsonNode statJson = jsonReader.read("stat.json");// todo обработать null
-            final String startDateStr = statJson.get("startDate").asText();
-            final String endDateStr = statJson.get("endDate").asText();
-            StatisticDbManager statisticDbManager = new SimpleStatisticDbManager(dataSource);
-            StatisticConverter statisticConverter = new SimpleStatisticConverter();
-            StatisticService statisticService = new SimpleStatisticService(statisticDbManager, statisticConverter);
-            final Date startDate = Date.valueOf(startDateStr);
-            final Date endDate = Date.valueOf(endDateStr);
-            final List<StatisticDto> statisticDtos = statisticService.get(new StatisticQuery(startDate, endDate));
+
+            final StatisticDbManager statisticDbManager = new SimpleStatisticDbManager(dataSource);
+            final StatisticConverter statisticConverter = new SimpleStatisticConverter();
+            final StatisticService statisticService = new SimpleStatisticService(statisticDbManager, statisticConverter);
+            final DateSearchManager searchManager = new DateSearchManager(statisticService, gson);
+
+            DateParser dateParser = new DateParser();
+            final Date startDate = dateParser.getProperty("startDate", jsonNode);
+            final Date endDate = dateParser.getProperty("endDate", jsonNode);
+
+            final JsonObject resultStatJson = searchManager.find(new StatisticQuery(startDate, endDate));
+
+            jsonWriter.write(resultStatJson, "output.json");
         }
     }
 }
