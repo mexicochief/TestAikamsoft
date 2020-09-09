@@ -27,12 +27,14 @@ public class DateParser {
     public Date getProperty(String name, JsonNode jsonNode) {
         final JsonNode dateNode = jsonNode.get(name);
         if (dateNode == null) {
-            throw new RuntimeException("property " + name + " not found");
+            final String message = "property " + name + " not found";
+            logger.error(gson.toJson(Map.of("error", message)));
+            throw new ParseException(message);
         }
         try {
             dateFormatter.parse(dateNode.asText());
         } catch (DateTimeParseException e) {
-            logger.error(gson.toJson(Map.of("error",e.getMessage())));
+            logger.error(gson.toJson(Map.of("error", e.getMessage())));
             throw new ParseException(e.getMessage());
         }
         return Date.valueOf(dateNode.asText());

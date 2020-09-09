@@ -6,7 +6,7 @@ import org.kolesnikov.model.User;
 public class SimpleUserConverter implements UserConverter {
     @Override
     public User convert(UserDto userDto) {
-        return new User(userDto.getFirstName(), userDto.getLastName());
+        return new User(null, userDto.getFirstName(), userDto.getLastName());
     }
 
     @Override

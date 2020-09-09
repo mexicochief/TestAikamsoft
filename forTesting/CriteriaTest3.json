@@ -1,0 +1,7 @@
+{
+  "criterias": [
+    {"lastName": "Lee"},
+    {"productName": "Cola", "minTimes": 2},
+    {"minExpenses": 10, "maxExpenses": 100}
+  ]
+}
